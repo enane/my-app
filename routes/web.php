@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 
 /*
@@ -20,28 +22,10 @@ Route::get('/', function () {
     return inertia('Home');
 });
 
-Route::get('/users', function (Request $request) {
-    $search = $request->search;
-    return inertia('Users', [
-        'users' => User::query()
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'LIKE', '%' . $search . '%');
-            })
-            ->paginate(10)
-            ->through(fn($user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email
-            ])
-//        'users' => User::query()
-//            ->paginate(10)
-//            ->through(fn($user) => [
-//                'id' => $user->id,
-//                'name' => $user->name,
-//                'email' => $user->email
-//            ])
-    ]);
-});
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::post('/users/store', [UserController::class, 'store']);
+Route::post('/users/{user}', [UserController::class, 'update']);
+Route::delete('/users/{user}', [UserController::class, 'destroy']);
 
 Route::get('/settings', function () {
     return inertia('Settings', [

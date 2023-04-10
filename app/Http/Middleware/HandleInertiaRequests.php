@@ -2,9 +2,14 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Closure;
+use Tofandel\InertiaVueModal\HandlesInertiaModalRequest;
+
+
 
 class HandleInertiaRequests extends Middleware
 {
@@ -25,8 +30,6 @@ class HandleInertiaRequests extends Middleware
      */
     public function version(Request $request): ?string
     {
-        $version = parent::version($request);
-        if(!$request->headers->has('x-inertia-version')) $request->headers->set('x-inertia-version', $version);
         return parent::version($request);
     }
 
@@ -40,6 +43,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
+            'isModal' => (bool) $request->header('X-Inertia-Modal'),
             'auth' => [
                 'user' => [
                     'username' => 'JohnDoe'
@@ -47,4 +51,20 @@ class HandleInertiaRequests extends Middleware
             ]
         ]);
     }
+
+    public function handle(Request $request, Closure $next)
+    {
+        $response = parent::handle($request, $next);
+
+        if ($response instanceof RedirectResponse && (bool) $request->header('X-Inertia-Modal-Redirect-Back')) {
+            return back(303);
+        }
+
+        if (Inertia::getShared('isModal')) {
+            $response->headers->set('X-Inertia-Modal', true);
+        }
+
+        return $response;
+    }
+
 }

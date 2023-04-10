@@ -1,5 +1,5 @@
 <template>
-    <Link :class="{'font-bold underline': active}">
+    <Link :class="{'bg-gray-100 dark:bg-gray-700': active}">
         <slot />
     </Link>
 </template>

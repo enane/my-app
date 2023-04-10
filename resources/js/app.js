@@ -3,6 +3,9 @@ import {createInertiaApp, Link, Head} from '@inertiajs/vue3'
 import Layout from "./Shared/Layout.vue";
 import {resolvePageComponent} from "laravel-vite-plugin/inertia-helpers";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import { createVfm } from 'vue-final-modal'
+import 'flowbite';
+const vfm = createVfm()
 
 createInertiaApp({
     progress: {
@@ -30,7 +33,8 @@ createInertiaApp({
             .use(plugin)
             .component('Link', Link)
             .component('Head', Head)
-            // .component('font-awesome-icon', FontAwesomeIcon)
+            .component('font-awesome-icon', FontAwesomeIcon)
+            .use(vfm)
             .mount(el)
     },
     title: title => `My App | ${title}`
